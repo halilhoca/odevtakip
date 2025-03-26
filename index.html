@@ -3,18 +3,76 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Öğrenci Takip Sistemi</title>
+    <title>Öğrenci Program Takibi</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h2>Öğretmen Giriş</h2>
-        <form action="login.php" method="POST">
-            <input type="text" name="username" placeholder="Kullanıcı Adı" required>
-            <input type="password" name="password" placeholder="Şifre" required>
-            <button type="submit">Giriş Yap</button>
+        <h2>Program Oluştur</h2>
+        <form id="programForm">
+            <div class="day">
+                <label for="day1">Pazartesi:</label>
+                <input type="text" id="day1" placeholder="Ödev: Kitap Sayfa 1-5" required>
+            </div>
+            <div class="day">
+                <label for="day2">Salı:</label>
+                <input type="text" id="day2" placeholder="Ödev: Kitap Sayfa 6-10" required>
+            </div>
+            <div class="day">
+                <label for="day3">Çarşamba:</label>
+                <input type="text" id="day3" placeholder="Ödev: Kitap Sayfa 11-15" required>
+            </div>
+            <div class="day">
+                <label for="day4">Perşembe:</label>
+                <input type="text" id="day4" placeholder="Ödev: Kitap Sayfa 16-20" required>
+            </div>
+            <div class="day">
+                <label for="day5">Cuma:</label>
+                <input type="text" id="day5" placeholder="Ödev: Kitap Sayfa 21-25" required>
+            </div>
+            <button type="button" onclick="generateLink()">Bağlantı Oluştur</button>
         </form>
-        <p>Hesabınız yok mu? <a href="register.html">Kayıt Ol</a></p>
+        <div id="generatedLink" style="display:none;">
+            <p>Oluşturulan Bağlantı:</p>
+            <input type="text" id="programLink" readonly>
+            <button onclick="copyLink()">Kopyala</button>
+        </div>
     </div>
+
+    <script>
+        function generateLink() {
+            let programText = '';
+            for (let i = 1; i <= 5; i++) {
+                let dayText = document.getElementById('day' + i).value;
+                if (dayText.trim() === "") {
+                    alert("Lütfen her gün için ödev girin.");
+                    return;
+                }
+                programText += 'Gün ' + i + ': ' + dayText + '\n';
+            }
+
+            let uniqueID = Date.now().toString(36);
+            localStorage.setItem(uniqueID, programText);
+            let link = window.location.origin + window.location.pathname + "?id=" + uniqueID;
+            document.getElementById("programLink").value = link;
+            document.getElementById("generatedLink").style.display = "block";
+        }
+
+        function copyLink() {
+            let linkInput = document.getElementById("programLink");
+            linkInput.select();
+            document.execCommand("copy");
+            alert("Bağlantı kopyalandı!");
+        }
+
+        function loadProgram() {
+            let params = new URLSearchParams(window.location.search);
+            let programID = params.get("id");
+            if (programID && localStorage.getItem(programID)) {
+                document.body.innerHTML = "<div class='container'><h2>Öğrenci Programı</h2><pre>" + localStorage.getItem(programID) + "</pre></div>";
+            }
+        }
+        window.onload = loadProgram;
+    </script>
 </body>
 </html>
